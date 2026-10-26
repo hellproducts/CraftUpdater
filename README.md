@@ -1,5 +1,7 @@
 # Craft Updater
 
+[![CI](https://github.com/hellproducts/CraftUpdater/actions/workflows/ci.yml/badge.svg)](https://github.com/hellproducts/CraftUpdater/actions/workflows/ci.yml)
+
 A tiny **native Windows tray app**, written in Rust with [egui](https://github.com/emilk/egui),
 that keeps the **portable** editions of the [ArtCraft](https://getartcraft.com)
 apps — PhotoCraft, VectorCraft and the rest — up to date from their official

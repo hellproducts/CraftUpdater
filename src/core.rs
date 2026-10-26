@@ -446,7 +446,9 @@ fn http_client() -> Result<reqwest::blocking::Client> {
 
 fn get_release(client: &reqwest::blocking::Client, repo: &str) -> Result<Release> {
     let url = format!("https://api.github.com/repos/{repo}/releases/latest");
-    let mut req = client.get(&url).header("Accept", "application/vnd.github+json");
+    let mut req = client
+        .get(&url)
+        .header("Accept", "application/vnd.github+json");
     if let Ok(tok) = std::env::var("GITHUB_TOKEN") {
         if !tok.is_empty() {
             req = req.header("Authorization", format!("Bearer {tok}"));
@@ -454,7 +456,11 @@ fn get_release(client: &reqwest::blocking::Client, repo: &str) -> Result<Release
     }
     let resp = req.send().context("contacting GitHub")?;
     if !resp.status().is_success() {
-        bail!("GitHub returned HTTP {} for {}", resp.status().as_u16(), repo);
+        bail!(
+            "GitHub returned HTTP {} for {}",
+            resp.status().as_u16(),
+            repo
+        );
     }
     resp.json::<Release>().context("parsing release JSON")
 }
@@ -513,11 +519,8 @@ pub fn perform_update(
     let program_dir = &check.program_dir;
 
     // temp working dir
-    let work = std::env::temp_dir().join(format!(
-        "craft-updater-{}-{}",
-        app.name,
-        std::process::id()
-    ));
+    let work =
+        std::env::temp_dir().join(format!("craft-updater-{}-{}", app.name, std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work)?;
     let zip_path = work.join(&check.asset_name);
@@ -683,7 +686,10 @@ mod tests {
         std::fs::write(srcdir.join("sub").join("b.txt"), b"world").unwrap();
         let dst = tmp.join("dst");
         copy_dir(&srcdir, &dst).unwrap();
-        assert_eq!(std::fs::read(dst.join("sub").join("b.txt")).unwrap(), b"world");
+        assert_eq!(
+            std::fs::read(dst.join("sub").join("b.txt")).unwrap(),
+            b"world"
+        );
         let _ = std::fs::remove_dir_all(&tmp);
     }
 }

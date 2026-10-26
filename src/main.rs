@@ -30,7 +30,11 @@ enum Status {
     Checking,
     UpToDate,
     UpdateReady,
-    Updating { done: u64, total: u64, stage: String },
+    Updating {
+        done: u64,
+        total: u64,
+        stage: String,
+    },
     Error(String),
     Done(String),
 }
@@ -236,9 +240,11 @@ impl CraftUpdater {
         };
         std::thread::spawn(move || {
             let tx2 = tx.clone();
-            let mut progress =
-                move |d: u64, t: u64, s: &str| { let _ = tx2.send(Msg::Progress(idx, d, t, s.to_string())); };
-            let r = core::perform_update(&app, &check, keep, &mut progress).map_err(|e| e.to_string());
+            let mut progress = move |d: u64, t: u64, s: &str| {
+                let _ = tx2.send(Msg::Progress(idx, d, t, s.to_string()));
+            };
+            let r =
+                core::perform_update(&app, &check, keep, &mut progress).map_err(|e| e.to_string());
             let _ = tx.send(Msg::Updated(idx, r));
         });
     }
@@ -322,13 +328,16 @@ impl CraftUpdater {
                 Msg::Checked(i, Err(e)) => self.set_err(i, e),
                 Msg::Progress(i, d, t, s) => {
                     if i < self.rows.len() {
-                        self.rows[i].status = Status::Updating { done: d, total: t, stage: s };
+                        self.rows[i].status = Status::Updating {
+                            done: d,
+                            total: t,
+                            stage: s,
+                        };
                     }
                 }
                 Msg::Updated(i, Ok(bk)) => {
                     if i < self.rows.len() {
-                        let v = self
-                            .rows[i]
+                        let v = self.rows[i]
                             .check
                             .as_ref()
                             .map(|c| c.latest.clone())
@@ -354,13 +363,29 @@ impl CraftUpdater {
                     self.show_window(ctx);
                     self.banner = Some(format!(
                         "Update available for {}: {}",
-                        self.cfg.lock().unwrap().apps.get(i).map(|a| a.name.clone()).unwrap_or_default(),
+                        self.cfg
+                            .lock()
+                            .unwrap()
+                            .apps
+                            .get(i)
+                            .map(|a| a.name.clone())
+                            .unwrap_or_default(),
                         ver
                     ));
                     #[cfg(windows)]
                     {
-                        let name = self.cfg.lock().unwrap().apps.get(i).map(|a| a.name.clone()).unwrap_or_default();
-                        notify(&format!("{name} update available"), &format!("Version {ver} is ready to install."));
+                        let name = self
+                            .cfg
+                            .lock()
+                            .unwrap()
+                            .apps
+                            .get(i)
+                            .map(|a| a.name.clone())
+                            .unwrap_or_default();
+                        notify(
+                            &format!("{name} update available"),
+                            &format!("Version {ver} is ready to install."),
+                        );
                     }
                 }
             }
@@ -545,11 +570,7 @@ impl CraftUpdater {
                         .selected_text(self.add_sel.clone())
                         .show_ui(ui, |ui| {
                             for (name, _) in &available {
-                                ui.selectable_value(
-                                    &mut self.add_sel,
-                                    name.to_string(),
-                                    *name,
-                                );
+                                ui.selectable_value(&mut self.add_sel, name.to_string(), *name);
                             }
                         });
                     if accent_button(ui, "Add", ACCENT_BLUE, true).clicked() {
@@ -615,7 +636,9 @@ impl CraftUpdater {
                         close = true;
                     }
                     let del = egui::Button::new(
-                        RichText::new("Remove + delete folder").color(Color32::WHITE).strong(),
+                        RichText::new("Remove + delete folder")
+                            .color(Color32::WHITE)
+                            .strong(),
                     )
                     .fill(RED)
                     .rounding(Rounding::same(8.0))
@@ -631,9 +654,11 @@ impl CraftUpdater {
                 if !path.is_empty() {
                     ui.add_space(6.0);
                     ui.label(
-                        RichText::new("“Delete folder” permanently removes the install folder above.")
-                            .size(11.0)
-                            .color(RED),
+                        RichText::new(
+                            "“Delete folder” permanently removes the install folder above.",
+                        )
+                        .size(11.0)
+                        .color(RED),
                     );
                 }
             });
@@ -684,7 +709,11 @@ impl CraftUpdater {
                 // progress bar while updating
                 if let Status::Updating { done, total, stage } = self.rows[i].status.clone() {
                     ui.add_space(8.0);
-                    let frac = if total > 0 { done as f32 / total as f32 } else { 0.0 };
+                    let frac = if total > 0 {
+                        done as f32 / total as f32
+                    } else {
+                        0.0
+                    };
                     ui.add(
                         egui::ProgressBar::new(frac)
                             .fill(accent)
@@ -791,9 +820,13 @@ impl CraftUpdater {
                             .rounding(Rounding::same(8.0))
                             .inner_margin(egui::Margin::same(10.0))
                             .show(ui, |ui| {
-                                egui::ScrollArea::vertical().max_height(140.0).show(ui, |ui| {
-                                    ui.label(RichText::new(&c.release_notes).size(12.0).color(TEXT));
-                                });
+                                egui::ScrollArea::vertical()
+                                    .max_height(140.0)
+                                    .show(ui, |ui| {
+                                        ui.label(
+                                            RichText::new(&c.release_notes).size(12.0).color(TEXT),
+                                        );
+                                    });
                             });
                     }
                 }
@@ -863,8 +896,14 @@ impl CraftUpdater {
                 ui.add_space(8.0);
                 ui.add(egui::Slider::new(&mut cfg.keep_backups, 0..=10).text("Backups to keep"));
                 ui.add_space(8.0);
-                ui.checkbox(&mut cfg.notify_on_update, "Show a pop-up when an update is found");
-                ui.checkbox(&mut cfg.close_to_tray, "Close button (X) minimizes to the tray");
+                ui.checkbox(
+                    &mut cfg.notify_on_update,
+                    "Show a pop-up when an update is found",
+                );
+                ui.checkbox(
+                    &mut cfg.close_to_tray,
+                    "Close button (X) minimizes to the tray",
+                );
                 ui.checkbox(&mut cfg.start_minimized, "Start minimized to the tray");
                 if ui
                     .checkbox(&mut cfg.launch_at_login, "Launch when I sign in to Windows")
@@ -884,15 +923,27 @@ impl CraftUpdater {
 
 fn top_bar(app: &mut CraftUpdater, ctx: &egui::Context) {
     egui::TopBottomPanel::top("top")
-        .frame(egui::Frame::none().fill(BG).inner_margin(egui::Margin::symmetric(16.0, 12.0)))
+        .frame(
+            egui::Frame::none()
+                .fill(BG)
+                .inner_margin(egui::Margin::symmetric(16.0, 12.0)),
+        )
         .show(ctx, |ui| {
             ui.horizontal(|ui| {
-                ui.label(RichText::new("Craft Updater").size(20.0).strong().color(TEXT));
+                ui.label(
+                    RichText::new("Craft Updater")
+                        .size(20.0)
+                        .strong()
+                        .color(TEXT),
+                );
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     if ghost_button(ui, "⚙ Settings", true).clicked() {
                         app.settings_open = !app.settings_open;
                     }
-                    let any_ready = app.rows.iter().any(|r| matches!(r.status, Status::UpdateReady));
+                    let any_ready = app
+                        .rows
+                        .iter()
+                        .any(|r| matches!(r.status, Status::UpdateReady));
                     if accent_button(ui, "Update all", ACCENT_BLUE, any_ready).clicked() {
                         app.update_all();
                     }
@@ -908,9 +959,13 @@ fn footer(_app: &mut CraftUpdater, ui: &mut egui::Ui) {
     ui.separator();
     ui.horizontal(|ui| {
         ui.label(
-            RichText::new(format!("Craft Updater v{}  ·  {}", env!("CARGO_PKG_VERSION"), core::current_arch()))
-                .size(11.0)
-                .color(MUTED),
+            RichText::new(format!(
+                "Craft Updater v{}  ·  {}",
+                env!("CARGO_PKG_VERSION"),
+                core::current_arch()
+            ))
+            .size(11.0)
+            .color(MUTED),
         );
     });
 }
@@ -930,9 +985,15 @@ fn banner(ui: &mut egui::Ui, text: &str, _on_close: impl FnOnce()) {
 
 fn chip(ui: &mut egui::Ui, name: &str, accent: Color32) {
     let letters: String = name.chars().take(1).collect::<String>()
-        + &name.chars().filter(|c| c.is_uppercase()).nth(1).map(|c| c.to_string()).unwrap_or_default();
+        + &name
+            .chars()
+            .filter(|c| c.is_uppercase())
+            .nth(1)
+            .map(|c| c.to_string())
+            .unwrap_or_default();
     let (rect, _) = ui.allocate_exact_size(Vec2::splat(44.0), egui::Sense::hover());
-    ui.painter().rect_filled(rect, Rounding::same(10.0), accent.linear_multiply(0.9));
+    ui.painter()
+        .rect_filled(rect, Rounding::same(10.0), accent.linear_multiply(0.9));
     ui.painter().text(
         rect.center(),
         egui::Align2::CENTER_CENTER,
@@ -953,7 +1014,11 @@ fn accent_button(ui: &mut egui::Ui, label: &str, accent: Color32, enabled: bool)
     ui.add_enabled(
         enabled,
         egui::Button::new(RichText::new(label).color(Color32::WHITE).strong())
-            .fill(if enabled { accent } else { accent.linear_multiply(0.4) })
+            .fill(if enabled {
+                accent
+            } else {
+                accent.linear_multiply(0.4)
+            })
             .rounding(Rounding::same(8.0))
             .min_size(Vec2::new(92.0, 32.0)),
     )
@@ -1254,14 +1319,15 @@ fn set_autostart(enable: bool) {
     use winreg::enums::HKEY_CURRENT_USER;
     use winreg::RegKey;
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
-    let Ok((run, _)) =
-        hkcu.create_subkey(r"Software\Microsoft\Windows\CurrentVersion\Run")
-    else {
+    let Ok((run, _)) = hkcu.create_subkey(r"Software\Microsoft\Windows\CurrentVersion\Run") else {
         return;
     };
     if enable {
         if let Ok(exe) = std::env::current_exe() {
-            let _ = run.set_value("CraftUpdater", &format!("\"{}\" --minimized", exe.display()));
+            let _ = run.set_value(
+                "CraftUpdater",
+                &format!("\"{}\" --minimized", exe.display()),
+            );
         }
     } else {
         let _ = run.delete_value("CraftUpdater");
