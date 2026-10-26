@@ -130,6 +130,17 @@ assets/          app icon (png + ico) and tray icon
 Rust · egui/eframe · reqwest (rustls) · zip · sha2 · tray-icon ·
 tauri-winrt-notification · winreg · windows-sys
 
+## Contributing
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as below, without any additional terms or conditions.
+
 ## License
 
-MIT OR Apache-2.0 — your choice. *(Add `LICENSE` file(s) to confirm.)*
+Licensed under either of
+
+- MIT license ([LICENSE-MIT](LICENSE-MIT))
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
+
+at your option.

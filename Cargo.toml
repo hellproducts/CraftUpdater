@@ -4,6 +4,7 @@ version = "1.0.0"
 edition = "2021"
 description = "Portable updater for PhotoCraft and VectorCraft (ArtCraft)"
 authors = ["Bogdan"]
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 # Windows is the real target, so no x11/wayland here. They are added only for
