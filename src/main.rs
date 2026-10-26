@@ -70,9 +70,9 @@ fn launch_label(app_name: &str, exe_stem: &str) -> String {
     let rem = stem
         .strip_prefix(&lname)
         .unwrap_or(&stem)
-        .trim_matches(|c| c == '-' || c == '_' || c == ' ');
+        .trim_matches(['-', '_', ' ']);
     let suffix: Vec<String> = rem
-        .split(|c| c == '-' || c == '_' || c == ' ')
+        .split(['-', '_', ' '])
         .filter(|s| !s.is_empty())
         .map(|s| {
             if s.eq_ignore_ascii_case("cli") || s.eq_ignore_ascii_case("gui") {
@@ -423,7 +423,6 @@ impl CraftUpdater {
                 win_show(h, false);
             }
             let _ = ctx;
-            return;
         }
         #[cfg(not(windows))]
         ctx.send_viewport_cmd(egui::ViewportCommand::Visible(false));
@@ -1261,8 +1260,7 @@ fn build_tray(ctx: &egui::Context, menu_tx: Sender<String>) -> Option<tray_icon:
     MenuEvent::set_event_handler(Some(move |ev: MenuEvent| {
         match ev.id.0.as_str() {
             "quit" => std::process::exit(0),
-            "open" => show_self_window(true),
-            "check" => show_self_window(true),
+            "open" | "check" => show_self_window(true),
             _ => {}
         }
         if let Ok(tx) = menu_tx.lock() {

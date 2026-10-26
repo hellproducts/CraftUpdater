@@ -14,20 +14,15 @@ pub const VERSION_MARKER: &str = ".craft-version";
 
 // ---------------------------------------------------------------- configuration
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Default)]
 pub enum CheckInterval {
     Manual,
     OnStartup,
     Hourly,
     EverySixHours,
+    #[default]
     Daily,
     Weekly,
-}
-
-impl Default for CheckInterval {
-    fn default() -> Self {
-        CheckInterval::Daily
-    }
 }
 
 impl CheckInterval {
