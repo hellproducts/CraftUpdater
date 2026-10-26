@@ -1,0 +1,21 @@
+# Rust / Cargo
+/target/
+**/*.rs.bk
+*.pdb
+
+# Note: Cargo.lock IS committed for binaries (do not ignore it).
+
+# App runtime files (generated next to the .exe)
+craft-updater.toml
+*-backups/
+
+# Editors / IDEs
+/.vscode/
+/.idea/
+*.swp
+*~
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
