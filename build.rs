@@ -3,6 +3,6 @@
 // embed-resource auto-detects the right resource compiler for the target.
 fn main() {
     if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("windows") {
-        let _ = embed_resource::compile("app.rc", embed_resource::NONE);
+        embed_resource::compile("app.rc", embed_resource::NONE);
     }
 }
